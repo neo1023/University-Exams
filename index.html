@@ -3,42 +3,160 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>受験テキストビューワー</title>
+  <title>大学受験テキストビューワー</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>大学受験テキスト</h1>
+  <h1>📘 大学受験テキストビューワー</h1>
 
-  <label for="subject-select">科目を選んでください：</label>
-  <select id="subject-select" onchange="loadPDF()">
-    <option value="">-- 選択してください --</option>
-    <option value="pdfs/英語文法.pdf">英語 文法</option>
-    <option value="pdfs/英語長文.pdf">英語 長文</option>
-    <option value="pdfs/物理力学.pdf">物理 力学</option>
-    <option value="pdfs/物理電磁気.pdf">物理 電磁気</option>
-    <option value="pdfs/物理波動.pdf">物理  波動</option>
-    <option value="pdfs/物理原子.pdf">物理 原子</option>
-    <option value="pdfs/物理 総合演習.pdf">物理 総合演習</option>
-    <option value="pdfs/数学I.pdf">数学I</option>
-    <option value="pdfs/数学II.pdf">数学II</option>
-    <option value="pdfs/数学IIIC.pdf">数学IIIC</option>  
-    <option value="pdfs/数学A.pdf">数学A</option>
-    <option value="pdfs/数学B.pdf">数学B</option>
-    <option value="pdfs/数学演習.pdf">数学 演習</option>
-  </select>
-
-  <div id="pdf-viewer" style="margin-top: 20px;">
-    <iframe id="pdf-frame" src="" width="100%" height="800px" style="border:1px solid #ccc;"></iframe>
-  </div>
-
+  <div id="card-container"></div>
+  <div id="toc" style="display: none;"></div>
+  <iframe id="pdf-frame" src="" width="100%" height="800px" style="display:none; border:1px solid #ccc; border-radius: 8px;"></iframe>
   <button onclick="window.print()">🖨️ 印刷する</button>
 
   <script>
-    function loadPDF() {
-      const select = document.getElementById("subject-select");
-      const frame = document.getElementById("pdf-frame");
-      frame.src = select.value;
+    const data = {
+      英語: {
+        grammer: {
+          "文構造と文型": "pdfs/文型.pdf",
+          "時制": "pdfs/dummy.pdf",
+          "助動詞": "pdfs/dummy.pdf",
+          "受動態": "pdfs/dummy.pdf",
+          "不定詞": "pdfs/dummy.pdf",
+          "動名詞": "pdfs/dummy.pdf",
+          "分詞": "pdfs/dummy.pdf",
+          "関係詞": "pdfs/dummy.pdf",
+          "仮定法": "pdfs/dummy.pdf",
+          "比較": "pdfs/dummy.pdf",
+          "前置詞": "pdfs/dummy.pdf",
+          "接続詞": "pdfs/dummy.pdf",
+          "強調・倒置": "pdfs/dummy.pdf",
+          "語法・構文": "pdfs/dummy.pdf"
+        },
+        reading: {
+          "長文読解": "pdfs/dummy.pdf"
+        }
+      },
+      数学: {
+        数学I: {
+          "数と式": "pdfs/dummy.pdf",
+          "図形と計量": "pdfs/dummy.pdf",
+          "二次関数": "pdfs/dummy.pdf",
+          "データの分析": "pdfs/dummy.pdf"
+        },
+        数学A: {
+          "場合の数と確率": "pdfs/dummy.pdf",
+          "図形の性質": "pdfs/dummy.pdf",
+          "整数の性質": "pdfs/dummy.pdf"
+        },
+        数学II: {
+          "式と証明": "pdfs/dummy.pdf",
+          "図形と方程式": "pdfs/dummy.pdf",
+          "指数・対数": "pdfs/dummy.pdf",
+          "三角関数": "pdfs/dummy.pdf",
+          "微積": "pdfs/dummy.pdf"
+        },
+        数学B: {
+          "数列": "pdfs/dummy.pdf",
+          "確率統計": "pdfs/dummy.pdf"
+        },
+        数学C: {
+          "複素数平面": "pdfs/dummy.pdf",
+          "ベクトル": "pdfs/dummy.pdf"
+        },
+        数学III: {
+          "極限": "pdfs/dummy.pdf",
+          "微分法": "pdfs/dummy.pdf",
+          "積分法": "pdfs/dummy.pdf"
+        }
+      },
+      物理: {
+        力学: {
+          "速度と加速度": "pdfs/dummy.pdf",
+          "運動の法則": "pdfs/dummy.pdf",
+          "エネルギーと仕事": "pdfs/dummy.pdf",
+          "運動量と衝突": "pdfs/dummy.pdf",
+          "円運動と万有引力": "pdfs/dummy.pdf"
+        },
+        波動: {
+          "波の性質": "pdfs/dummy.pdf",
+          "音の性質": "pdfs/dummy.pdf",
+          "光の性質": "pdfs/dummy.pdf"
+        },
+        熱: {
+          "熱の性質": "pdfs/dummy.pdf",
+          "熱力学": "pdfs/dummy.pdf"
+        },
+        電磁気: {
+          "電場・電位": "pdfs/dummy.pdf",
+          "電流と磁場": "pdfs/dummy.pdf",
+          "電磁誘導": "pdfs/dummy.pdf"
+        },
+        原子: {
+          "電子": "pdfs/dummy.pdf",
+          "放射線と核反応": "pdfs/dummy.pdf"
+        }
+      }
+    };
+
+    const container = document.getElementById("card-container");
+    const toc = document.getElementById("toc");
+    const frame = document.getElementById("pdf-frame");
+
+    let currentSubject = null;
+    let currentChapter = null;
+
+    function createCards(items, clickHandler) {
+      container.innerHTML = '';
+      toc.style.display = "none";
+      frame.style.display = "none";
+      frame.src = "";
+
+      Object.entries(items).forEach(([label, value]) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.textContent = label;
+        card.onclick = () => clickHandler(label, value);
+        container.appendChild(card);
+      });
     }
+
+    function showSubjects() {
+      currentSubject = null;
+      currentChapter = null;
+      createCards(data, (subject, chapters) => {
+        currentSubject = subject;
+        showChapters(chapters);
+      });
+    }
+
+    function showChapters(chapters) {
+      currentChapter = null;
+      createCards(chapters, (chapter, units) => {
+        currentChapter = chapter;
+        showUnits(units);
+        showToc(currentSubject, currentChapter);
+      });
+    }
+
+    function showUnits(units) {
+      createCards(units, (unit, pdf) => {
+        toc.style.display = "none";
+        frame.src = pdf;
+        frame.style.display = "block";
+      });
+    }
+
+    function showToc(subject, chapter) {
+      toc.style.display = "block";
+      toc.innerHTML = `<h2>📖 ${subject} - ${chapter} 目次</h2><ul>` +
+        Object.keys(data[subject][chapter]).map(u => `<li>✏️ ${u}</li>`).join("") +
+        `</ul>`;
+    }
+
+    // 初期表示：科目カード
+    showSubjects();
   </script>
 </body>
 </html>
