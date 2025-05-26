@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>受験テキストビューワー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>大学受験テキスト</h1>
+
+  <label for="subject-select">科目を選んでください：</label>
+  <select id="subject-select" onchange="loadPDF()">
+    <option value="">-- 選択してください --</option>
+    <option value="pdfs/英語文法.pdf">英語 文法</option>
+    <option value="pdfs/英語長文.pdf">英語 長文</option>
+    <option value="pdfs/物理力学.pdf">物理 力学</option>
+    <option value="pdfs/物理電磁気.pdf">物理 電磁気</option>
+    <option value="pdfs/物理波動.pdf">物理  波動</option>
+    <option value="pdfs/物理原子.pdf">物理 原子</option>
+    <option value="pdfs/物理 総合演習.pdf">物理 総合演習</option>
+    <option value="pdfs/数学I.pdf">数学I</option>
+    <option value="pdfs/数学II.pdf">数学II</option>
+    <option value="pdfs/数学IIIC.pdf">数学IIIC</option>  
+    <option value="pdfs/数学A.pdf">数学A</option>
+    <option value="pdfs/数学B.pdf">数学B</option>
+    <option value="pdfs/数学演習.pdf">数学 演習</option>
+  </select>
+
+  <div id="pdf-viewer" style="margin-top: 20px;">
+    <iframe id="pdf-frame" src="" width="100%" height="800px" style="border:1px solid #ccc;"></iframe>
+  </div>
+
+  <button onclick="window.print()">🖨️ 印刷する</button>
+
+  <script>
+    function loadPDF() {
+      const select = document.getElementById("subject-select");
+      const frame = document.getElementById("pdf-frame");
+      frame.src = select.value;
+    }
+  </script>
+</body>
+</html>

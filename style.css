@@ -1,0 +1,15 @@
+
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+@media print {
+  button, select, label, h1 {
+    display: none;
+  }
+  iframe {
+    height: 100vh;
+    border: none;
+  }
+}
