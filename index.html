@@ -143,8 +143,7 @@
     function showUnits(units) {
       createCards(units, (unit, pdf) => {
         toc.style.display = "none";
-        frame.src = pdf;
-        frame.style.display = "block";
+        window.open(pdf, "_blank");
       });
     }
 
